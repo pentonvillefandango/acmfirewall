@@ -15,3 +15,4 @@ v.03 WIP
 acmfirewall -b <path/to/file> blocks CIDRS in file
 acmfirewall -u <path/to/file> unblocks CIDRs in file
 file read loop
+acmfirewall function

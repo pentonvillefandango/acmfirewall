@@ -6,47 +6,56 @@
 # -v verbose -h help -f file -l log -b block -u unblock - l list output -h header
 # WARNING - not everything above is implemented yet. See README.md for details of this version
 # process arguments
+# dtelegy activeclients/firewall -XPOST -d '{"target": "1.1.1.1/32"}'
+# dtelegy activeclients/firewall -XDELETE -d '{"target": "1.1.1.1/32"}'
 
 # Check provided file exists function
 
 filexist() {
-if [[ ! -f ${1} ]]
-then
-    echo "No file provided or does not exist - please check the filename and path"
-    exit 1
-fi
+    if [[ ! -f $1 ]]
+        then
+            echo "No file provided or does not exist - please check the filename and path"
+            exit 1
+    fi
 }   
+# Assign filename to variable
+
+INPUTFILE=${1}
 
 # detelgy function
 
 dtelegy() {
- path=$1
+    path=$1
+    shift
+    curl "http://127.0.0.1:8083/v1/$path" -H '_token_info: {"username": "admin", "role": "AdminRole", "groups": ["b4373447-c6d1-4c57-bd9a-ec895de5d26f"]}' "$@"
+}
+# acmfirewall function - this uses the detelgy function
 
- curl "http://127.0.0.1:8083/v1/$path" -H '_token_info: {"username": "admin", "role": "AdminRole", "groups": ["b4373447-c6d1-4c57-bd9a-ec895de5d26f"]}' "$@"
+acmfirewall() {
+dtelegy activeclients/firewall $1 -d $2 
 }
 
-
-
-
 # Check user is root
+
 if [[ ${UID} -ne 0 ]]
-then
-    echo "This script needs superuser rights  - Please use sudo"
-    exit 1
+    then
+        echo "This script needs superuser rights  - Please use sudo"
+        exit 1
 fi
 
-
-
+# process arguments
 
 while getopts ulb OPTION
 do
     case ${OPTION} in
         u)
             MODE='unblock'
+            OPERATION='-XDELETE'
             echo "CIDRs in file will be UNBLOCKED"
             ;;
         b)
             MODE='block'
+            OPERATION='-XPOST'
             echo "CIDRs will be BLOCKED"
             ;;
         l)
@@ -69,11 +78,11 @@ shift "$(( OPTIND -1 ))"
 
 if [[ "${MODE}" != 'list' ]]
     then
-        filexist ${1}
+        filexist ${INPUTFILE}
 fi
 
 # main script block
-#
+
 if [[ "${MODE}" = 'list' ]]
     then
         dtelegy activeclients/firewall
@@ -83,22 +92,22 @@ elif [[ "${MODE}" = 'unblock' ]]
         # detelegy unblock
         while read line
             do
-               echo "Record is : $line"
-               done < testfile      
-               echo 'CIDRs have been unblocked'
+                TARGET="'{\"target\": \"$line\"}'"               
+                acmfirewall ${OPERATION} ${TARGET}  
+            done < ${INPUTFILE}
+            echo 'CIDRs have been unblocked'
 elif [[ "${MODE}" = 'block' ]]
     then
         # dtelegy block
-        echo 'CIDRs have been blocked'
+        while read line
+            do
+                TARGET="'{\"target\": \"$line\"}'"               
+                acmfirewall ${OPERATION} ${TARGET}  
+            done < ${INPUTFILE}      
+            echo 'CIDRs have been blocked'
 fi
-    
-    
 
-
-
-# process arguments
 # usage function
-# log function
+# logfile function
 # help function
 # report funntion
-
