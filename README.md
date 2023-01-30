@@ -2,6 +2,8 @@
 
 v0.1
 Initial commit
+Added check for root user
+Added check for existence of provided file
 
 v0.2
 Basic Functionality
