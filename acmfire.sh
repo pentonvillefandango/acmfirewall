@@ -81,7 +81,11 @@ if [[ "${MODE}" = 'list' ]]
 elif [[ "${MODE}" = 'unblock' ]] 
     then
         # detelegy unblock
-        echo 'CIDRs have been unblocked'
+        while read line
+            do
+               echo "Record is : $line"
+               done < testfile      
+               echo 'CIDRs have been unblocked'
 elif [[ "${MODE}" = 'block' ]]
     then
         # dtelegy block
