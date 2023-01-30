@@ -7,7 +7,7 @@
 # WARNING - not everything above is implemented yet. See README.md for details of this version
 # process arguments
 
-# Check provided file exists
+# Check provided file exists function
 
 filexist() {
 if [[ ! -f ${1} ]]
@@ -21,7 +21,7 @@ fi
 
 dtelegy() {
  path=$1
- shift
+
  curl "http://127.0.0.1:8083/v1/$path" -H '_token_info: {"username": "admin", "role": "AdminRole", "groups": ["b4373447-c6d1-4c57-bd9a-ec895de5d26f"]}' "$@"
 }
 
@@ -29,11 +29,11 @@ dtelegy() {
 
 
 # Check user is root
-# if [[ ${UID} -ne 0 ]]
-# then
-#     echo "This script needs superuser rights  - Please use sudo"
-#     exit 1
-# fi
+if [[ ${UID} -ne 0 ]]
+then
+    echo "This script needs superuser rights  - Please use sudo"
+    exit 1
+fi
 
 
 
@@ -76,7 +76,7 @@ fi
 #
 if [[ "${MODE}" = 'list' ]]
     then
-        # dtelegy activeclients/firewall
+        dtelegy activeclients/firewall
         echo 'CIDRs have been listed'
 elif [[ "${MODE}" = 'unblock' ]] 
     then
