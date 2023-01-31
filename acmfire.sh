@@ -1,12 +1,40 @@
 #!/bin/bash
-
-# acmfirewall v0.3
+VERSION='v0.4'
+# acmfirewall script
 #
-# This script will Interrogate/Activate/Deactviate the acm firewall for one or more IPs / CIDR
-# -v verbose -h help -f file -l log -b block -u unblock - l list output -h header
-# WARNING - not everything above is implemented yet. See README.md for details of this version
+# This script will Interrogate/Activate/Deactviate the acm firewall for one or more IPs / CIDR blocks
 
-# Check provided file exists function
+# help function
+    
+acmfirehelp() {
+    echo
+    echo " 
+    This script enables the user to block a range of CIDRs from the active query function, list the 
+    CIDRs that are currently blocked, and unblock ranges of CIDRs to enable active query again.
+
+    Usage is as follows:
+
+    acmfire.sh -h                     Display this help function
+    acmfire.sh -l                     Display the currently blocked CIDRs
+    acmfire.sh -b path/to/inputfile   Blocks the CIDRs listed in the inputfile
+    acmfire.sh -u path/to/inputfile   Blocks the CIDRs listed in the inputfile
+
+    The format expected for inputfile is as follows:
+
+    10.23.45.0/24
+    10.33.45.0/24
+
+    Blocking/Unblocking single IPs is possible by using a 32 bit subnet mask as follows:
+
+    192.168.1.23/32
+
+    IPs without a following subnet mask are not permitted and may cause unpredictable results.
+    
+    The curent version ${VERSION} has very little error handling and expects an accurate inputfile
+    to be provided.
+    "
+
+}
 
 filenotexist() {
     if [[ ! -f $1 ]]
@@ -33,9 +61,13 @@ fi
 
 # process arguments
 
-while getopts ulb OPTION
+while getopts ulhb OPTION
 do
     case ${OPTION} in
+        h)
+            acmfirehelp
+            exit 0
+            ;;
         u)
             MODE='unblock'
             OPERATION='-XDELETE'

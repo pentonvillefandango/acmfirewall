@@ -30,9 +30,9 @@ file read loop
 
 markdown updates to README
 
-## v.04 WIP
+## v.04 --complete
 
-add help
+added help
 
 ## v.05
 
