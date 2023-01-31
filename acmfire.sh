@@ -1,38 +1,26 @@
 #!/bin/bash
 
-# acmfirewall v0.1
+# acmfirewall v0.3
 #
 # This script will Interrogate/Activate/Deactviate the acm firewall for one or more IPs / CIDR
 # -v verbose -h help -f file -l log -b block -u unblock - l list output -h header
 # WARNING - not everything above is implemented yet. See README.md for details of this version
-# process arguments
-# dtelegy activeclients/firewall -XPOST -d '{"target": "1.1.1.1/32"}'
-# dtelegy activeclients/firewall -XDELETE -d '{"target": "1.1.1.1/32"}'
 
 # Check provided file exists function
 
-filexist() {
+filenotexist() {
     if [[ ! -f $1 ]]
         then
             echo "No file provided or does not exist - please check the filename and path"
             exit 1
     fi
 }   
-# Assign filename to variable
-
-INPUTFILE=${1}
-
 # detelgy function
 
 dtelegy() {
     path=$1
     shift
     curl "http://127.0.0.1:8083/v1/$path" -H '_token_info: {"username": "admin", "role": "AdminRole", "groups": ["b4373447-c6d1-4c57-bd9a-ec895de5d26f"]}' "$@"
-}
-# acmfirewall function - this uses the detelgy function
-
-acmfirewall() {
-dtelegy activeclients/firewall $1 -d $2 
 }
 
 # Check user is root
@@ -51,16 +39,22 @@ do
         u)
             MODE='unblock'
             OPERATION='-XDELETE'
-            echo "CIDRs in file will be UNBLOCKED"
+            echo
+            echo "All CIDRs in supplied file will be UNBLOCKED"
+            echo    
             ;;
         b)
             MODE='block'
             OPERATION='-XPOST'
-            echo "CIDRs will be BLOCKED"
+            echo
+            echo "All CIDRs in supplied file will be BLOCKED"
+            echo
             ;;
         l)
             MODE='list'
+            echo
             echo "BLOCKED CIDRs will be LISTED"
+            echo
             ;;
         ?)
             # insert usage function later
@@ -76,38 +70,46 @@ shift "$(( OPTIND -1 ))"
 
 # if requested mode is not list then check if the file exists
 
+INPUTFILE=${1}
+
 if [[ "${MODE}" != 'list' ]]
     then
-        filexist ${INPUTFILE}
+        filenotexist ${INPUTFILE}
 fi
 
 # main script block
 
 if [[ "${MODE}" = 'list' ]]
     then
-        dtelegy activeclients/firewall
-        echo 'CIDRs have been listed'
+        dtelegy activeclients/firewall -XGET | jq -jr '.[] | .target, "\n"' | sed s/null// | sed 's/Type//'
+        echo
+        echo 'All blocked CIDRs have been listed'
+        echo 
 elif [[ "${MODE}" = 'unblock' ]] 
     then
         # detelegy unblock
-        while read line
+        UNBLOCKED=0
+        while read CIDR
             do
-                TARGET="'{\"target\": \"$line\"}'"               
-                acmfirewall ${OPERATION} ${TARGET}  
+                dtelegy activeclients/firewall $OPERATION -d '{"target": "'"$CIDR"'"}'
+                echo "$CIDR"
+                (( UNBLOCKED++ ))
             done < ${INPUTFILE}
-            echo 'CIDRs have been unblocked'
+            echo
+            echo "$UNBLOCKED CIDRs have been unblocked"
+            echo
 elif [[ "${MODE}" = 'block' ]]
     then
         # dtelegy block
-        while read line
+        BLOCKED=0
+        while read CIDR
             do
-                TARGET="'{\"target\": \"$line\"}'"               
-                acmfirewall ${OPERATION} ${TARGET}  
+                dtelegy activeclients/firewall $OPERATION -d '{"target": "'"$CIDR"'"}'
+                echo "$CIDR"
+                (( BLOCKED++ ))
             done < ${INPUTFILE}      
-            echo 'CIDRs have been blocked'
+            echo
+            echo "$BLOCKED CIDRs have been blocked"
+            echo    
 fi
 
-# usage function
-# logfile function
-# help function
-# report funntion

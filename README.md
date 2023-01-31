@@ -18,14 +18,22 @@ dtelegy function implemented
 
 moved file existence check to function
 
-## v.03 --WIP
+## v.03 --complete
 
 acmfirewall -b <path/to/file> blocks CIDRS in file
 
 acmfirewall -u <path/to/file> unblocks CIDRs in file
 
+acmfirewall -l lists all currently blocked CIDRs
+
 file read loop
 
-acmfirewall function
-
 markdown updates to README
+
+## v.04 WIP
+
+add help
+
+## v.05
+
+log to file function
