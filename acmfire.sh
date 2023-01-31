@@ -1,5 +1,5 @@
 #!/bin/bash
-VERSION='v0.4'
+VERSION='(v0.4)'
 # acmfirewall script
 #
 # This script will Interrogate/Activate/Deactviate the acm firewall for one or more IPs / CIDR blocks
@@ -9,15 +9,17 @@ VERSION='v0.4'
 acmfirehelp() {
     echo
     echo " 
-    This script enables the user to block a range of CIDRs from the active query function, list the 
-    CIDRs that are currently blocked, and unblock ranges of CIDRs to enable active query again.
+    This script enables the user to block a range of CIDRs, list the CIDRs that 
+    are currently blocked finally, unblock ranges of CIDRs. 
+
+    It is not possible to Active Query any CIDR that is in the blocked state.
 
     Usage is as follows:
 
     acmfire.sh -h                     Display this help function
     acmfire.sh -l                     Display the currently blocked CIDRs
     acmfire.sh -b path/to/inputfile   Blocks the CIDRs listed in the inputfile
-    acmfire.sh -u path/to/inputfile   Blocks the CIDRs listed in the inputfile
+    acmfire.sh -u path/to/inputfile   Unblocks the CIDRs listed in the inputfile
 
     The format expected for inputfile is as follows:
 
