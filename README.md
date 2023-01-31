@@ -1,8 +1,8 @@
 # acmfirewall
 
-## v0.1
+## v0.1 --complete
 
-Initial commit --complete
+Initial commit
 
 Added check for root user
 
@@ -18,7 +18,7 @@ dtelegy function implemented
 
 moved file existence check to function
 
-## v.03 WIP
+## v.03 --WIP
 
 acmfirewall -b <path/to/file> blocks CIDRS in file
 
