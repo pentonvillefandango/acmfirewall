@@ -37,3 +37,4 @@ added help
 ## v.05
 
 log to file function
+remove all jq > awk
